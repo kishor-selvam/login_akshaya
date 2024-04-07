@@ -3,43 +3,37 @@ import "./Loginform.css";
 import { FaUser, FaLock } from "react-icons/fa";
 import axios from "axios";
 import { API_URL } from "../../config";
+import { useNavigate } from 'react-router-dom'; // Import useHistory from react-router-dom
 
 function Loginform({ setIsLoggedIn }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const history = useNavigate(); // Initialize useHistory
 
   const handleLoginBackend = async (e) => {
-    e.preventDefault(); 
-
+    e.preventDefault(); // Prevent default form submission
+    
     try {
-      const res = await axios.post(API_URL + "auth/login", {
-        username,
-        password,
-      });
-
-      if (res.data.success) {
+      const response = await axios.post(`http://localhost:5000/login`, { username, password }); // Make a POST request to backend
+      
+      if (response.data.success) {
+        // If login successful, set isLoggedIn state to true and redirect to dashboard
         setIsLoggedIn(true);
+        history.push('/dashboard');
       } else {
-        setError(res.data.message);
+        setError(response.data.message); // Set error message if login failed
       }
     } catch (error) {
-      setError("An error occurred while logging in."); 
+      console.error('Error logging in:', error);
+      setError('An error occurred while logging in'); // Set error message if request fails
     }
   };
 
-  const handleLogin = () => {
-    if (username === "akshaya" && password === "123456") {
-      // Set isLoggedIn to true upon successful login
-      setIsLoggedIn(true);
-    } else {
-      alert("Invalid username or password");
-    }
-  };
   return (
     <div className="wrapper">
-      <form action="">
-        <h1>IRT ANALYSYS</h1>
+      <form>
+        <h1>IRT ANALYSIS</h1>
         <div className="input-box">
           <input
             type="text"
@@ -52,7 +46,7 @@ function Loginform({ setIsLoggedIn }) {
         </div>
         <div className="input-box">
           <input
-            type="text"
+            type="password" // Change input type to password
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
